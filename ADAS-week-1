@@ -1,0 +1,34 @@
+import cv2
+import numpy as np
+from tensorflow.keras.applications import MobileNetV2
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input, decode_predictions
+
+model = MobileNetV2(weights="imagenet")
+
+image = cv2.imread("day.jpg")
+
+if image is None:
+    print("Error: day.jpg not found")
+else:
+    img = cv2.resize(image, (224, 224))
+
+    x = np.expand_dims(img, axis=0)
+    x = preprocess_input(x)
+
+    predictions = model.predict(x, verbose=0)
+    print("MobileNetV2 Prediction:")
+    print(decode_predictions(predictions, top=3)[0])
+
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    brightness = np.mean(gray)
+
+    print("Ambient Brightness:", brightness)
+
+    if brightness < 80:
+        print("Headlights ON")
+    else:
+        print("Headlights OFF")
+
+    cv2.imshow("Input Image", image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
